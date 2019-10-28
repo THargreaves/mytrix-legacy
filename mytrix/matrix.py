@@ -290,6 +290,26 @@ class Matrix:
         """
         return isinstance(obj, (int, float, complex))
 
+    @classmethod
+    def isValidMatrix(cls, obj):
+        """
+        This method checks if a given object is a valid matrix object,
+        namely if its elements are all numeric and are all of the same type;
+        it checks that the matrix has valid dimension too (i.e. m,n > 0 and
+        all of the "inner" arrays are of the same length).
+        """
+        if (obj.m <= 0) or (obj.n <= 0):
+            return False
+
+        for i in range(obj.m):
+            for j in range(obj.n):
+                if not Matrix.isNumeric(obj[i,j]):
+                    return False
+                elif type(obj[i,j]) != type(obj[0,0]):
+                    return False
+            if len(obj.rows[i]) != len(obj.rows[0]):
+                return False
+        return True
 
 class MatrixTests(unittest.TestCase):
     """Unit test functions."""
@@ -436,6 +456,30 @@ class MatrixTests(unittest.TestCase):
             m1.subset([0, 3], [1])
         with self.assertRaises(exc.OutOfBoundsError):
             m1.subset([0, 2], [3])
+
+    def testIsValidMatrix(self):
+        """ Test matrix validity checks """
+
+        m1 = Matrix.fromRows([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        m2 = Matrix.fromRows([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]])
+        m3 = Matrix.fromRows([[1, 2, 3], [4, 0.5, 6]])
+        m4 = Matrix.fromRows([["I"], ["love"], ["testing"]])
+        #m5 = Matrix.fromRows([[1, 2], [4, 5, 6], [7])
+
+        # test it gives true for an integer matrix
+        self.assertTrue(Matrix.isValidMatrix(m1))
+        # test it gives true for a float matrix
+        self.assertTrue(Matrix.isValidMatrix(m2))
+        # test it gives false for a matrix of different valid types
+        self.assertFalse(Matrix.isValidMatrix(m3))
+        # test it gives true for a string matrix
+        self.assertFalse(Matrix.isValidMatrix(m4))
+        """
+        Tried to test it gives true for a valid type matrix of incorrect
+        dimensions but fromRows works too well and didn't let me make such a
+        dodgy matrix...
+        """
+        # self.assertFalse(isValidMatrix(m5))
 
 if __name__ == "__main__":
     unittest.main()
